@@ -1,0 +1,1 @@
+"""VNC Snapshot package"""

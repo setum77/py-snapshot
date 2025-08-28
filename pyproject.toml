@@ -1,0 +1,29 @@
+[project]
+name = "py-snapshot"
+version = "0.1.0"
+description = "Создание VNC снимков для мониторинга работы компьютеров"
+authors = [{ name = "setum77", email = "tum.ser2018@yandex.ru" }]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "python-dotenv>=1.1.1",
+    "schedule>=1.2.2",
+]
+
+[project.scripts]
+vnc-snapshot = "vnc_snapshot.main:main"
+vnc-snapshot-scheduler = "vnc_snapshot.scheduler:main"
+vnc-archive = "vnc_snapshot.archiver:main"
+
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "flake8>=6.0",
+]
