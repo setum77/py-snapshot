@@ -3,7 +3,7 @@ import os
 import logging
 from datetime import datetime, date
 from pathlib import Path
-from .config import load_computers, get_password_path, get_base_directory
+from .config import load_computers, get_password_path, get_base_directory, get_time_interval
 from .utils import check_port, create_snapshot
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,10 @@ def main():
         # Load configuration
         computers = load_computers()
         password_path = get_password_path()
-        base_dir = get_base_directory()
+        base_dir = Path(get_base_directory()) / 'jpg'
+                
+        # Создаем директорию если их нет
+        Path(base_dir).mkdir(parents=True, exist_ok=True)
         
         # Create timestamp
         today = date.today()

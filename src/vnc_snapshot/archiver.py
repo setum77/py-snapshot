@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 import shutil
 import logging
 from typing import Optional
-from .config import get_ftp_config
+from .config import get_ftp_config, get_base_directory
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ def upload_file_ftp(server: str, username: str, password: str,
         logger.info(f"Подключено к {server}")
         
         # Переходим в нужную директорию
+        create_remote_directory(ftp, remote_path)
         ftp.cwd(remote_path)
         
         # Открываем локальный файл в бинарном режиме для чтения
@@ -37,6 +38,24 @@ def upload_file_ftp(server: str, username: str, password: str,
     except Exception as e:
         logger.error(f"Ошибка при загрузке файла на FTP: {e}")
         return False
+
+def create_remote_directory(ftp, path):
+    """Рекурсивно создает директории на FTP-сервере"""
+    try:
+        ftp.cwd(path)  # Пытаемся перейти - если есть, все ок
+    except:
+        # Если директории нет, создаем по частям
+        parts = path.split('/')
+        current_path = ""
+        
+        for part in parts:
+            if part:  # Пропускаем пустые части
+                current_path += "/" + part
+                try:
+                    ftp.cwd(current_path)
+                except:
+                    ftp.mkd(current_path)  # Создаем директорию
+                    ftp.cwd(current_path)  # Переходим в нее
 
 def delete_old_files_and_dirs(path: str, days: int = 2) -> None:
     """Delete files and empty directories older than specified days"""
@@ -74,13 +93,14 @@ def create_daily_archive() -> bool:
         # Получаем конфигурацию
         config = get_ftp_config()
         
-        backup_dir = os.path.expanduser('~/py_zip_snpsht/')
-        source_dir = os.path.expanduser('~/py_snapshot/')
+        backup_dir = Path(get_base_directory()) / 'zip'
+        source_dir = Path(get_base_directory()) / 'jpg'
         ftp_server = config['server']
         ftp_username = config['username']
         ftp_password = config['password']
         ftp_dir = config['remote_path']
         days_to_keep = config['days_to_keep']
+        
         
         logger.info(f"Конфигурация FTP: сервер={ftp_server}, пользователь={ftp_username}, путь={ftp_dir}")
         logger.info(f"Количество дней хранения: {days_to_keep}")
@@ -106,12 +126,13 @@ def create_daily_archive() -> bool:
         
         # Отправляем по ФТП
         logger.info("Начало загрузки архива на FTP...")
-        success = upload_file_ftp(ftp_server, ftp_username, ftp_password, ftp_dir, backup_path, backup_file)
-        
-        if success:
-            logger.info("Архив успешно загружен на FTP")
-        else:
-            logger.error("Ошибка при загрузке архива на FTP")
+        if ftp_server:
+            success = upload_file_ftp(ftp_server, ftp_username, ftp_password, ftp_dir, backup_path, backup_file)
+            
+            if success:
+                logger.info("Архив успешно загружен на FTP")
+            else:
+                logger.error("Ошибка при загрузке архива на FTP")
             
         # Удаляем скриншоты старше указанного количества дней из основной папки
         logger.info(f"Очистка старых файлов (старше {days_to_keep} дней)...")

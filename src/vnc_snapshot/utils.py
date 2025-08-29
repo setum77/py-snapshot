@@ -1,4 +1,5 @@
 """Utility functions"""
+import os
 import socket
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +15,17 @@ def check_port(ip: str, port: int, timeout: int = 1) -> bool:
             return result == 0
     except Exception:
         return False
+
+# Не использую, но пусть лежит    
+# def create_directory(path):
+#     """Создает директорию если она не существует"""
+#     if not os.path.exists(path):
+#         try:
+#             os.makedirs(path, exist_ok=True)
+#             return True
+#         except Exception as e:
+#             return False
+#     return True
 
 def create_snapshot(comp_info: Dict, password_path: str, output_dir: Path, timestamp: str):
     """Create VNC snapshot"""

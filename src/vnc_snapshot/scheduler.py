@@ -6,13 +6,15 @@ import signal
 import sys
 from .main import main as run_snapshot
 from .archiver import create_daily_archive
+from .config import get_time_interval
 
 # Настройка логирования
 logging.basicConfig(
+    encoding='utf-8',
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('vnc_snapshot.log'),
+        logging.FileHandler('vnc_snapshot.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -60,6 +62,9 @@ def main():
     """Основная функция планировщика"""
     global should_stop
     
+    # интервал сканирования (минуты)
+    time_interval = get_time_interval()
+    
     # Регистрация обработчиков сигналов
     signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
     signal.signal(signal.SIGTERM, signal_handler)  # systemctl stop
@@ -67,12 +72,16 @@ def main():
     logger.info("Запуск планировщика VNC snapshot")
     
     # Запланировать создание снимков каждые 3 минуты
-    schedule.every(3).minutes.do(snapshot_job)
+    schedule.every(time_interval).minutes.do(snapshot_job)
     
     # Запланировать создание архивов в 00:30 каждый день
-    schedule.every().day.at("00:30").do(archive_job)
+    schedule.every().day.at("00:30:00").do(archive_job)
     
-    # Выполнить сразу при запуске
+    # Отладка - покажем все запланированные задачи
+    logger.info(f"Запланированные задачи: {len(schedule.jobs)} шт.")
+    for job in schedule.jobs:
+        logger.info(f"Задача: {job}")
+    
     logger.info("Выполнение первого снимка...")
     snapshot_job()
     
@@ -80,6 +89,7 @@ def main():
     while not should_stop:
         schedule.run_pending()
         time.sleep(1)
+   
     
     logger.info("Планировщик остановлен. До свидания!")
     sys.exit(0)

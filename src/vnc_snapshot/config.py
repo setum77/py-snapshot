@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import List, Dict
 
+load_dotenv()
+
 def load_computers() -> List[Dict]:
     """Load computer list from JSON file"""
     # Попробуем получить путь из переменной окружения
@@ -31,21 +33,24 @@ def load_computers() -> List[Dict]:
 def get_password_path() -> str:
     """Get VNC password file path"""
     
-    load_dotenv()
     return os.path.expanduser(os.getenv('VNC_PASSWD_PATH', '~/.vnc/passwd'))
 
 def get_base_directory() -> Path:
     """Get base directory for snapshots"""
-    return Path(os.path.expanduser('~/py_snapshot'))
+    return Path(os.path.expanduser('~/py-snapshot-result'))
+
+def get_time_interval() -> int:
+    """Get time interval scan"""
+
+    return int(os.getenv('TIME_INTERVAL', 3))
 
 def get_ftp_config():
-    """Get FTP configuration from environment variables"""
-    load_dotenv()
+    """Get FTP configuration from environment variables"""    
     
     return {
-        'server': os.getenv('FTP_SERVER', '192.168.0.24'),
-        'username': os.getenv('FTP_USERNAME', 'lduser'),
-        'password': os.getenv('FTP_PASSWORD', ',fhbprhb'),
+        'server': os.getenv('FTP_SERVER', None),
+        'username': os.getenv('FTP_USERNAME', 'admin'),
+        'password': os.getenv('FTP_PASSWORD', 'anonimous'),
         'remote_path': os.getenv('FTP_REMOTE_PATH', '/BackUp/snapshot/by_python/'),
-        'days_to_keep': int(os.getenv('DAYS_TO_KEEP', '2'))
+        'days_to_keep': int(os.getenv('DAYS_TO_KEEP', 2))
     }
