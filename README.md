@@ -45,58 +45,84 @@
 ## Установка и запуск
 
 1. **Установить vncsnapshot**
+
    ```bash
    sudo apt update
    sudo apt install vncsnapshot
    ```
+
 2. **Создать зашифрованный файл с паролем от VNC сервера**
+
    - используется встроенная утилита создания паролей от vncsnapshot - vncpasswd
+
    * лучше перейти в домашнюю директориюв, в конфиг файле путь к паролю прописан от корневой папки
+
    ```bash
    cd ~
    vncpasswd
    ```
+
    - команда vncpasswd создаст (если ее еще нет) директорию .vnc и в ней файл passwd
-   - запросит пароль и подтверждение
+   - нужно ввести пароль от VNC и подтверждение и так 2 раза
+
 3. **Установить uv** - если не установлен
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
+
    - перезапустить shell или
+
    ```bash
    source $HOME/.local/bin/env
    ```
+
    - посмотреть версию uv
+
    ```bash
    uv --version
    ```
+
 4. **Записать проект любым способом**
+
    - если через GitHub
+
    ```bash
    cd ~
    git clone https://github.com/Setum77/py-snapshot.git
    ```
+
 5. **Перейти в созданную директорию**
+
    ```bash
    cd py-snapshot
    ```
+
 6. **Создать виртуальное окружение и активировать**
+
    ```bash
    uv venv
    source .venv/bin/activate
    ```
+
 7. **Установить зависимости**
+
    ```bash
    uv pip install -e .
    ```
+
 8. **Копируем `.env.exemple` в `.env`**
+
    ```bash
    cp env.example .env
    ```
+
 9. **Если в пункте 2 сохранили файл с паролем в другой папке, то открываем `.env` и редактируем путь `VNC_PASSWD_PATH`**
+
    ```bash
    nano .env
    ```
+
 10. **Задаем другие параметры в файле `.env`**
 
 - `VNC_PASSWD_PATH=~/.vnc/passwd` - путь к файлу с паролем от VNC
@@ -121,7 +147,7 @@ uv run vnc-snapshot-scheduler
 
 выключить комбинацией - Ctrl + C
 
-12. **После отладки можно создать задание cron или сервис автозапуска**
+13. **После отладки можно создать задание cron или сервис автозапуска**
     - создать автозапуск
     ```bash
     sudo nano /etc/systemd/system/vnc-snapshot.service
