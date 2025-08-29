@@ -97,8 +97,8 @@ After=network.target
 [Service]
 Type=simple
 User=your-username
-WorkingDirectory=/home/your-username/vnc-snapshot
-ExecStart=/home/your-username/vnc-snapshot/.venv/bin/vnc-snapshot-scheduler
+WorkingDirectory=/home/your-username/py-snapshot
+ExecStart=/home/your-username/py-snapshot/.venv/bin/vnc-snapshot-scheduler
 Restart=always
 RestartSec=10
 
@@ -137,3 +137,30 @@ WantedBy=multi-user.target
     ```bash
     sudo journalctl -u vnc-snapshot.service -f
     ```
+## Управление службой
+   
+   **Отключить автозапуск**
+   Даже если служба настроена как `WantedBy=multi-user.target`, ты можешь отключить её автозапуск, сохранив возможность ручного управления:
+   ```bash
+   sudo systemctl disable vnc-snapshot-scheduler.service
+   ```
+   
+   **Запустить службу вручную**
+   После отключения автозапуска ты всё ещё можешь запустить её вручную:
+   ```bash
+   sudo systemctl start vnc-snapshot-scheduler.service
+   ```
+   
+   **Остановка службы вручную**
+   ```bash
+   sudo systemctl stop vnc-snapshot-scheduler.service
+   ```
+
+   **Перезапуск службы**
+   ```bash
+   sudo systemctl restart vnc-snapshot-scheduler.service
+   ```
+   **Проверка статуса**
+   ```bash
+   sudo systemctl status vnc-snapshot-scheduler.service
+   ```
